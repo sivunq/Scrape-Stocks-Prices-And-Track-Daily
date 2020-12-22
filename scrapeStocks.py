@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 wb=openpyxl.load_workbook("FinTrack.xlsx")
 sheet=wb["CurrentStocks"]
 stocks=[]
-way=[]
 link=[]
 initialPrice=[]
 sharesCount=[]
@@ -16,13 +15,12 @@ colIndex=2
 #read all constant values
 while(sheet.cell(row=1,column=colIndex).value != "Total"):
     stocks.append(sheet.cell(row=1,column=colIndex).value)
-    way.append(sheet.cell(row=2,column=colIndex).value)
-    link.append(sheet.cell(row=3,column=colIndex).value)
-    initialPrice.append(sheet.cell(row=4,column=colIndex).value)
-    sharesCount.append(sheet.cell(row=5,column=colIndex).value)
+    link.append(sheet.cell(row=2,column=colIndex).value)
+    initialPrice.append(sheet.cell(row=3,column=colIndex).value)
+    sharesCount.append(sheet.cell(row=4,column=colIndex).value)
     colIndex=colIndex+1
 
-todayRow=95 #Update
+todayRow=100 #Update
 todayDate=str(datetime.today().strftime('%d-%m-%Y'))
 
 #logic to find empty cell or update today's data
@@ -47,16 +45,10 @@ for index in range(1,len(stocks)+4):
     
     #money control has two ways of showing stock prices, both handled seperately
     if(index>1 and index <= len(stocks)+1):
-        if(way[index-2]=="new"):
-            resp = requests.get(link[index-2], headers=headers)
-            soup = BeautifulSoup(resp.content, "html.parser")
-            mydivs = soup.findAll("div", {"class": "nsecp"})
-            price=mydivs[0]["rel"]
-        elif(way[index-2]=="old"):
-            resp = requests.get(link[index-2], headers=headers)
-            soup = BeautifulSoup(resp.content, "html.parser")
-            mydivs = soup.findAll("span", {"class": "span_price_wrap"})
-            price=mydivs[1].text
+        resp = requests.get(link[index-2], headers=headers)
+        soup = BeautifulSoup(resp.content, "html.parser")
+        mydivs = soup.findAll("div", {"class": "nsecp"})
+        price=mydivs[0]["rel"]
         price=(float(price)-initialPrice[index-2])*sharesCount[index-2]
         price= round(price,2)
         total=total+price
