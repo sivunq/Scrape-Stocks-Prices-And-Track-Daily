@@ -43,7 +43,7 @@ for index in range(1,len(stocks)+4):
     lightGreen = openpyxl.styles.colors.Color(rgb='A9D08E')
     darkGreen = openpyxl.styles.colors.Color(rgb='70AD47')
     
-    #money control has two ways of showing stock prices, both handled seperately
+    #scrape price from div 
     if(index>1 and index <= len(stocks)+1):
         resp = requests.get(link[index-2], headers=headers)
         soup = BeautifulSoup(resp.content, "html.parser")
