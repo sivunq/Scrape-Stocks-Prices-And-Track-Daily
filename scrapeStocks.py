@@ -6,21 +6,23 @@ from bs4 import BeautifulSoup
 
 wb=openpyxl.load_workbook("FinTrack.xlsx")
 sheet=wb["CurrentStocks"]
-stocks=[]
-link=[]
-initialPrice=[]
-sharesCount=[]
-colIndex=2
 
+stocksData={ 
+    "stockNames":[],
+    "webLink":[],
+    "buyPrice":[],
+    "shareCount":[]
+}
+colIndex=2
 #read all constant values
 while(sheet.cell(row=1,column=colIndex).value != "Total"):
-    stocks.append(sheet.cell(row=1,column=colIndex).value)
-    link.append(sheet.cell(row=2,column=colIndex).value)
-    initialPrice.append(sheet.cell(row=3,column=colIndex).value)
-    sharesCount.append(sheet.cell(row=4,column=colIndex).value)
+    stocksData["stockNames"].append(sheet.cell(row=1,column=colIndex).value)
+    stocksData["webLink"].append(sheet.cell(row=2,column=colIndex).value)
+    stocksData["shareCount"].append(sheet.cell(row=3,column=colIndex).value)
+    stocksData["buyPrice"].append(sheet.cell(row=4,column=colIndex).value)
     colIndex=colIndex+1
 
-todayRow=100 #Update
+todayRow=12 #Update
 todayDate=str(datetime.today().strftime('%d-%m-%Y'))
 
 #logic to find empty cell or update today's data
@@ -32,9 +34,9 @@ while(True):
         break
     todayRow=todayRow+1
 
-total=0
 headers = {"user-agent" : "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"}
-for index in range(1,len(stocks)+4):
+total=0
+for index in range(1,len(stocksData["stockNames"])+4):
     cellFill=sheet.cell(row=todayRow,column=index)
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
     cellFill.border = thin_border
@@ -43,19 +45,23 @@ for index in range(1,len(stocks)+4):
     lightGreen = openpyxl.styles.colors.Color(rgb='A9D08E')
     darkGreen = openpyxl.styles.colors.Color(rgb='70AD47')
     
-    #scrape price from div 
-    if(index>1 and index <= len(stocks)+1):
-        resp = requests.get(link[index-2], headers=headers)
+    if(index>1 and index <= len(stocksData["stockNames"])+1):
+        resp = requests.get(stocksData["webLink"][index-2], headers=headers)
         soup = BeautifulSoup(resp.content, "html.parser")
         mydivs = soup.findAll("div", {"class": "nsecp"})
         price=mydivs[0]["rel"]
-        price=(float(price)-initialPrice[index-2])*sharesCount[index-2]
-        price= round(price,2)
-        total=total+price
-        sheet.cell(row=todayRow,column=index).value=price
-        print(index-1,".",stocks[index-2],":",price)
+        price= round(float(price),2)
 
-        if(price < (sheet.cell(row=todayRow-1,column=index).value)):
+        sheet.cell(row=5,column=index).value=price #currentPrice
+        sheet.cell(row=6,column=index).value=price-stocksData["buyPrice"][index-2] #difference
+        profit=(float(price)-stocksData["buyPrice"][index-2])*stocksData["shareCount"][index-2]
+        profit= round(profit,2)
+        total=total+profit
+
+        sheet.cell(row=todayRow,column=index).value=profit
+        print(index-1,".",stocksData["stockNames"][index-2],":",profit)
+
+        if(profit < (sheet.cell(row=todayRow-1,column=index).value)):
             myColor=lightPink
         else:
             myColor=lightGreen
