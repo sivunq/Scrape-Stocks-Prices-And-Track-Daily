@@ -67,7 +67,7 @@ for index in range(1,len(stocksData["stockNames"])+4):
                                             mid_type='percentile', mid_value=50, mid_color='F8F80E',
                                             end_type='max', end_value=100, end_color='51C806'))
 	
-    #style each column
+    #style each cell
     cellFill=sheet.cell(row=todayRow,column=index)
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
     cellFill.border = thin_border
