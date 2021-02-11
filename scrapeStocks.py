@@ -38,12 +38,15 @@ while(True):
 
 headers = {"user-agent" : "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"}
 total=0
+
+#iterate for each stock and scrape values from moneycontrol.com
 for index in range(1,len(stocksData["stockNames"])+4):
     cellFill=sheet.cell(row=todayRow,column=index)
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
     cellFill.border = thin_border
     cellFill.alignment = Alignment(horizontal='center')
     
+    #update only stocks columns 
     if(index>1 and index <= len(stocksData["stockNames"])+1):
         resp = requests.get(stocksData["webLink"][index-2], headers=headers)
         soup = BeautifulSoup(resp.content, "html.parser")
