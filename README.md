@@ -3,7 +3,7 @@ Python code to scrape stocks prices from moneycontrol.com and update the same in
 
 
 ## Screenshot
-![screenshot](screenshot.png)
+![screenshot](screenshot.PNG)
 
 ## Usage:
 1. update "todayRow" variable accordingly
