@@ -41,12 +41,8 @@ total=0
 
 #iterate for each stock and scrape values from moneycontrol.com
 for index in range(1,len(stocksData["stockNames"])+4):
-    cellFill=sheet.cell(row=todayRow,column=index)
-    thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
-    cellFill.border = thin_border
-    cellFill.alignment = Alignment(horizontal='center')
-    
-    #update only stocks columns 
+
+    #update stocks prices 
     if(index>1 and index <= len(stocksData["stockNames"])+1):
         resp = requests.get(stocksData["webLink"][index-2], headers=headers)
         soup = BeautifulSoup(resp.content, "html.parser")
@@ -70,7 +66,13 @@ for index in range(1,len(stocksData["stockNames"])+4):
         sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F5602E',
                                             mid_type='percentile', mid_value=50, mid_color='F8F80E',
                                             end_type='max', end_value=100, end_color='51C806'))
-
+	
+    #style each column
+    cellFill=sheet.cell(row=todayRow,column=index)
+    thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
+    cellFill.border = thin_border
+    cellFill.alignment = Alignment(horizontal='center')
+	
     darkGreen = openpyxl.styles.colors.Color(rgb='70AD47')	
     myFill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=darkGreen)
     cellFill.fill = myFill
