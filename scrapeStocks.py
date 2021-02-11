@@ -1,6 +1,7 @@
 import urllib,requests,openpyxl
 from openpyxl.styles import colors,Color, PatternFill, Font, Border,Side,Alignment
 from openpyxl.cell import Cell
+from openpyxl.formatting.rule import ColorScaleRule
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -13,6 +14,7 @@ stocksData={
     "buyPrice":[],
     "shareCount":[]
 }
+
 colIndex=2
 #read all constant values
 while(sheet.cell(row=1,column=colIndex).value != "Total"):
@@ -41,9 +43,6 @@ for index in range(1,len(stocksData["stockNames"])+4):
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
     cellFill.border = thin_border
     cellFill.alignment = Alignment(horizontal='center')
-    lightPink = openpyxl.styles.colors.Color(rgb='FCE4D6')
-    lightGreen = openpyxl.styles.colors.Color(rgb='A9D08E')
-    darkGreen = openpyxl.styles.colors.Color(rgb='70AD47')
     
     if(index>1 and index <= len(stocksData["stockNames"])+1):
         resp = requests.get(stocksData["webLink"][index-2], headers=headers)
@@ -52,8 +51,8 @@ for index in range(1,len(stocksData["stockNames"])+4):
         price=mydivs[0]["rel"]
         price= round(float(price),2)
 
-        sheet.cell(row=5,column=index).value=price #currentPrice
-        sheet.cell(row=6,column=index).value=price-stocksData["buyPrice"][index-2] #difference
+        sheet.cell(row=6,column=index).value=price #currentPrice
+        sheet.cell(row=5,column=index).value=price-stocksData["buyPrice"][index-2] #difference
         profit=(float(price)-stocksData["buyPrice"][index-2])*stocksData["shareCount"][index-2]
         profit= round(profit,2)
         total=total+profit
@@ -61,14 +60,13 @@ for index in range(1,len(stocksData["stockNames"])+4):
         sheet.cell(row=todayRow,column=index).value=profit
         print(index-1,".",stocksData["stockNames"][index-2],":",profit)
 
-        if(profit < (sheet.cell(row=todayRow-1,column=index).value)):
-            myColor=lightPink
-        else:
-            myColor=lightGreen
-    else:
-        myColor=darkGreen
-		
-    myFill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=myColor)
+        colIndex=openpyxl.utils.cell.get_column_letter(index)
+        sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F5602E',
+                                            mid_type='percentile', mid_value=50, mid_color='F8F80E',
+                                            end_type='max', end_value=100, end_color='51C806'))
+
+    darkGreen = openpyxl.styles.colors.Color(rgb='70AD47')	
+    myFill = openpyxl.styles.fills.PatternFill(patternType='solid', fgColor=darkGreen)
     cellFill.fill = myFill
             
     index=index+1
