@@ -1,5 +1,5 @@
 # Scrape-Stocks-Prices-And-Track-Daily
-Scrape stocks prices from moneycontrol.com and update the same in an excel sheet daily and view as a heat-map
+Scrape stocks prices from moneycontrol.com, update the same in an excel sheet daily and view as a heat-map
 
 
 ## Screenshot
