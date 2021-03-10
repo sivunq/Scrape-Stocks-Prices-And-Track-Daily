@@ -47,12 +47,15 @@ for index in range(1,len(stocksData["stockNames"])+4):
         resp = requests.get(stocksData["webLink"][index-2], headers=headers)
         soup = BeautifulSoup(resp.content, "html.parser")
         mydivs = soup.findAll("div", {"class": "nsecp"})
-        price=mydivs[0]["rel"]
+        try:
+            price=mydivs[0]["rel"]
+        except Exception:
+            price=1
+            print("some issue")
         price= round(float(price),2)
 
-        #find current price
-        sheet.cell(row=6,column=index).value=price #currentPrice
-        sheet.cell(row=5,column=index).value=price-stocksData["buyPrice"][index-2] #difference
+        sheet.cell(row=5,column=index).value=price #currentPrice
+        sheet.cell(row=6,column=index).value=price-stocksData["buyPrice"][index-2] #difference
         profit=(float(price)-stocksData["buyPrice"][index-2])*stocksData["shareCount"][index-2]
         profit= round(profit,2)
         total=total+profit
@@ -63,11 +66,11 @@ for index in range(1,len(stocksData["stockNames"])+4):
 
         #fill heat map
         colIndex=openpyxl.utils.cell.get_column_letter(index)
-        sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F5602E',
-                                            mid_type='percentile', mid_value=50, mid_color='F8F80E',
-                                            end_type='max', end_value=100, end_color='51C806'))
+        sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F7525D',
+                                            mid_type='percentile', mid_value=50, mid_color='FFFA99',
+                                            end_type='max', end_value=100, end_color='60B37F'))
 	
-    #style each cell
+    #style each column
     cellFill=sheet.cell(row=todayRow,column=index)
     thin_border = Border(left=Side(style='thin'), right=Side(style='thin'),top=Side(style='thin'),bottom=Side(style='thin'))
     cellFill.border = thin_border
