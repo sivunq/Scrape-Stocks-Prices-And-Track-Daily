@@ -66,7 +66,7 @@ for index in range(1,len(stocksData["stockNames"])+4):
 
         #fill heat map
         colIndex=openpyxl.utils.cell.get_column_letter(index)
-        sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F7525D',
+        sheet.conditional_formatting.add(colIndex+str(8)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F75E68',
                                             mid_type='percentile', mid_value=50, mid_color='FFFA99',
                                             end_type='max', end_value=100, end_color='60B37F'))
 	
