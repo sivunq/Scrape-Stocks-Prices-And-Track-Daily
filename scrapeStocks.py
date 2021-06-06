@@ -14,8 +14,9 @@ dayChangeRow=3
 shareCountRow=4
 buyPriceRow=5
 currentPriceRow=6
-differenceRow=7
-startRow=9
+yesterdaysPriceRow=7
+differenceRow=8
+startRow=10
     
 #read all constant values
 def getDataFromSheet():
@@ -36,22 +37,24 @@ def getDataFromSheet():
 
 #logic to find empty cell or update today's data
 def getTodaysRow():
-    todayRow=36 #Update
+    flagSameDay=False
+    todayRow=73 #Update
     todayDate=str(datetime.today().strftime('%d-%m-%Y'))
 
     while(True):
         if(str(sheet.cell(row=todayRow,column=1).value) == todayDate):
+            flagSameDay=True
             break
-        if(str(sheet.cell(row=todayRow,column=1).value) == 'None'):
+        elif(str(sheet.cell(row=todayRow,column=1).value) == 'None'):
             sheet.cell(row=todayRow,column=1).value = todayDate
             break
         todayRow=todayRow+1
-    return todayRow
-
+        
+    return todayRow,flagSameDay
 
 def main():
     stocksData=getDataFromSheet()
-    todayRow=getTodaysRow()
+    todayRow,flagSameDay=getTodaysRow()
 
     total=0
     headers = {"user-agent" : "Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36"}
@@ -69,10 +72,13 @@ def main():
                 print("some issue happened...")
                 
             price= round(float(price),2)
-            
-			#dayChange
-            yesterdaysPrice=sheet.cell(row=currentPriceRow,column=index).value
-            sheet.cell(row=dayChangeRow,column=index).value=round(price-yesterdaysPrice,2) 
+             
+	    #update yesterdaysPrice
+            if(not flagSameDay):
+                sheet.cell(row=yesterdaysPriceRow,column=index).value=sheet.cell(row=currentPriceRow,column=index).value
+            #dayChange
+            yesterdaysPrice=sheet.cell(row=yesterdaysPriceRow,column=index).value
+            sheet.cell(row=dayChangeRow,column=index).value=round((price-yesterdaysPrice)*stocksData["shareCount"][index-2],2)
             #currentPrice
             sheet.cell(row=currentPriceRow,column=index).value=price 
             #difference
@@ -81,11 +87,9 @@ def main():
             profit=(float(price)-stocksData["buyPrice"][index-2])*stocksData["shareCount"][index-2]
             profit= round(profit,2)
             total=total+profit
-
             #fill profit
             sheet.cell(row=todayRow,column=index).value=profit
             print(index-1,".",stocksData["stockNames"][index-2],":",profit)
-
             #fill heat map
             colIndex=openpyxl.utils.cell.get_column_letter(index)
             sheet.conditional_formatting.add(colIndex+str(startRow)+":"+colIndex+str(todayRow) ,ColorScaleRule(start_type='min', start_value=0, start_color='F75E68',
