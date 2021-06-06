@@ -3,7 +3,7 @@ Scrape stocks prices from moneycontrol.com, update the same in an excel sheet da
 
 
 ## Screenshot
-![screenshot](screenshot.png)
+![screenshot](snip.png)
 
 ## Usage:
 1. update "todayRow" variable accordingly
